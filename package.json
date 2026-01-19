@@ -1,0 +1,28 @@
+{
+  "name": "ask-coach-bot",
+  "version": "1.0.0",
+  "description": "Ask Coach - GroupMe bot for baseball team logistics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "groupme",
+    "bot",
+    "baseball",
+    "logistics"
+  ],
+  "author": "Shawn Landau",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

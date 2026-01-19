@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Coach Admin - Events</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    h1 {
+      color: #333;
+      font-size: 28px;
+    }
+    .logout {
+      color: #667eea;
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 2px solid #667eea;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .logout:hover {
+      background: #667eea;
+      color: white;
+    }
+    .add-event-form {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    input[type="text"],
+    input[type="datetime-local"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .events-list {
+      margin-top: 20px;
+    }
+    .event-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+    .event-card:hover {
+      border-color: #667eea;
+    }
+    .event-card.inactive {
+      opacity: 0.6;
+      background: #fafafa;
+    }
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    .event-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .event-date {
+      color: #667eea;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .event-details {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .event-details p {
+      margin-bottom: 5px;
+    }
+    .event-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-edit, .btn-delete {
+      padding: 6px 12px;
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .btn-edit {
+      background: #4caf50;
+      color: white;
+    }
+    .btn-edit:hover {
+      background: #45a049;
+    }
+    .btn-delete {
+      background: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-delete:hover {
+      background: #da190b;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-active {
+      background: #e8f5e9;
+      color: #4caf50;
+    }
+    .badge-inactive {
+      background: #ffebee;
+      color: #f44336;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state h3 {
+      margin-bottom: 10px;
+      color: #666;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚾ Ask Coach Admin</h1>
+      <a href="/admin/logout" class="logout">Logout</a>
+    </div>
+
+    <h2>Add New Event</h2>
+    <form method="POST" action="/admin/events" class="add-event-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="start_datetime_local">Game Date & Time *</label>
+          <input type="datetime-local" id="start_datetime_local" name="start_datetime_local" required>
+        </div>
+        <div class="form-group">
+          <label for="arrival_minutes_before">Arrive Minutes Before</label>
+          <input type="number" id="arrival_minutes_before" name="arrival_minutes_before" value="45" min="0">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="venue_name">Venue Name *</label>
+          <input type="text" id="venue_name" name="venue_name" required placeholder="e.g., Riverside Park">
+        </div>
+        <div class="form-group">
+          <label for="field_number">Field Number</label>
+          <input type="text" id="field_number" name="field_number" placeholder="e.g., Field 3">
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="address">Address *</label>
+        <input type="text" id="address" name="address" required placeholder="e.g., 123 Main St, City, ST 12345">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="opponent">Opponent</label>
+          <input type="text" id="opponent" name="opponent" placeholder="e.g., Blue Jays">
+        </div>
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="is_active" name="is_active" checked>
+            <label for="is_active" style="margin-bottom: 0;">Active Event</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="parking_notes">Parking Notes</label>
+        <textarea id="parking_notes" name="parking_notes" placeholder="e.g., Park in the north lot near the playground"></textarea>
+      </div>
+
+      <button type="submit">Add Event</button>
+    </form>
+
+    <h2>Upcoming Events</h2>
+    <div class="events-list">
+      <% if (events.length === 0) { %>
+        <div class="empty-state">
+          <h3>No events yet</h3>
+          <p>Add your first event using the form above.</p>
+        </div>
+      <% } else { %>
+        <% events.forEach(function(event) { %>
+          <div class="event-card <%= event.is_active ? '' : 'inactive' %>">
+            <div class="event-header">
+              <div>
+                <div class="event-title">
+                  <%= event.venue_name %>
+                  <% if (event.field_number) { %>
+                    - <%= event.field_number %>
+                  <% } %>
+                  <span class="badge <%= event.is_active ? 'badge-active' : 'badge-inactive' %>">
+                    <%= event.is_active ? 'Active' : 'Inactive' %>
+                  </span>
+                </div>
+                <div class="event-date">
+                  <%= new Date(event.start_datetime_local).toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  }) %>
+                </div>
+                <div class="event-details">
+                  <p><strong>Address:</strong> <%= event.address %></p>
+                  <% if (event.opponent) { %>
+                    <p><strong>Opponent:</strong> <%= event.opponent %></p>
+                  <% } %>
+                  <% if (event.parking_notes) { %>
+                    <p><strong>Parking:</strong> <%= event.parking_notes %></p>
+                  <% } %>
+                  <p><strong>Arrive:</strong> <%= event.arrival_minutes_before %> minutes before</p>
+                </div>
+              </div>
+              <div class="event-actions">
+                <a href="/admin/events/<%= event.id %>/edit" class="btn-edit">Edit</a>
+                <form method="POST" action="/admin/events/<%= event.id %>/delete" style="display: inline;">
+                  <button type="submit" class="btn-delete" onclick="return confirm('Delete this event?')">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

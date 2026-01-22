@@ -93,10 +93,17 @@ app.get('/health', (req, res) => {
 app.get('/debug/password-check', (req, res) => {
   const hasPassword = !!process.env.ADMIN_PASSWORD;
   const passwordLength = process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.length : 0;
+  const firstChar = process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.charCodeAt(0) : null;
+  const lastChar = process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.charCodeAt(passwordLength - 1) : null;
+  
   res.json({ 
     configured: hasPassword,
     length: passwordLength,
-    note: 'Password value not shown for security'
+    firstCharCode: firstChar,
+    lastCharCode: lastChar,
+    hasLeadingSpace: firstChar === 32,
+    hasTrailingSpace: lastChar === 32,
+    note: 'Password value not shown for security. Char code 32 = space'
   });
 });
 

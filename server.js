@@ -89,6 +89,17 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint to check password configuration
+app.get('/debug/password-check', (req, res) => {
+  const hasPassword = !!process.env.ADMIN_PASSWORD;
+  const passwordLength = process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.length : 0;
+  res.json({ 
+    configured: hasPassword,
+    length: passwordLength,
+    note: 'Password value not shown for security'
+  });
+});
+
 // GroupMe webhook callback
 app.post('/groupme/callback', async (req, res) => {
   try {
@@ -123,15 +134,22 @@ app.post('/admin/login', (req, res) => {
   const { password } = req.body;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
+  console.log('Login attempt received');
+  console.log('Password provided length:', password ? password.length : 0);
+  console.log('Admin password configured:', !!adminPassword);
+  console.log('Admin password length:', adminPassword ? adminPassword.length : 0);
+
   if (!adminPassword) {
     req.session.loginError = 'Admin password not configured';
     return res.redirect('/admin/login');
   }
 
   if (password === adminPassword) {
+    console.log('Login successful');
     req.session.authenticated = true;
     res.redirect('/admin/events');
   } else {
+    console.log('Login failed - password mismatch');
     req.session.loginError = 'Invalid password';
     res.redirect('/admin/login');
   }

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "npm install"
   },
   "keywords": [
     "groupme",
@@ -23,6 +24,7 @@
     "express-session": "^1.17.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x",
+    "npm": ">=9.0.0"
   }
 }

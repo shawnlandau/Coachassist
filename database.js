@@ -114,7 +114,7 @@ function getUpcomingEvents() {
   const events = eventQueries.getActiveEvents.all();
   const now = new Date();
   const windowStart = new Date(now.getTime() - 12 * 60 * 60 * 1000); // 12 hours ago
-  const windowEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days ahead
+  const windowEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days ahead (extended from 7)
 
   return events.filter(event => {
     const eventDate = new Date(event.start_datetime_local);

@@ -19,15 +19,21 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Trust proxy - important for DigitalOcean App Platform
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.ADMIN_PASSWORD || 'change-this-secret-key',
   resave: true,
   saveUninitialized: false,
+  proxy: true, // Trust the reverse proxy
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    secure: false, // Set to false - DigitalOcean handles SSL at load balancer
-    sameSite: 'lax'
+    secure: false,
+    sameSite: 'lax',
+    path: '/'
   },
   rolling: true,
   name: 'teamhelper.sid'
@@ -223,7 +229,16 @@ app.post('/admin/login', (req, res) => {
   if (password === adminPassword) {
     console.log('Login successful');
     req.session.authenticated = true;
-    res.redirect('/admin/events');
+    
+    // Save session before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).send('Session error');
+      }
+      console.log('Session saved successfully, redirecting to /admin/events');
+      res.redirect('/admin/events');
+    });
   } else {
     console.log('Login failed - password mismatch');
     req.session.loginError = 'Invalid password';

@@ -107,6 +107,30 @@ app.get('/debug/password-check', (req, res) => {
   });
 });
 
+// Debug endpoint to test database and create sample event
+app.get('/debug/test-event', requireAuth, (req, res) => {
+  try {
+    const testDate = new Date();
+    testDate.setDate(testDate.getDate() + 1); // Tomorrow
+    const dateStr = testDate.toISOString().slice(0, 16);
+    
+    eventQueries.createEvent.run(
+      dateStr,
+      'Test Venue',
+      '123 Test Street, Test City, ST 12345',
+      'Field 1',
+      'Test parking notes',
+      'Test Opponent',
+      45,
+      1
+    );
+    
+    res.json({ success: true, message: 'Test event created! Check your events list.' });
+  } catch (error) {
+    res.json({ success: false, error: error.message, stack: error.stack });
+  }
+});
+
 // GroupMe webhook callback
 app.post('/groupme/callback', async (req, res) => {
   try {

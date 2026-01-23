@@ -26,17 +26,17 @@ app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.ADMIN_PASSWORD || 'change-this-secret-key',
   resave: true,
-  saveUninitialized: false,
-  proxy: true, // Trust the reverse proxy
+  saveUninitialized: true,
+  proxy: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: false, // Try with false to see if it helps
     secure: false,
-    sameSite: 'lax',
     path: '/'
+    // Removed sameSite - let browser decide
   },
   rolling: true,
-  name: 'teamhelper.sid'
+  name: 'connect.sid' // Try default session name
 }));
 
 // Template rendering helper
@@ -230,13 +230,19 @@ app.post('/admin/login', (req, res) => {
     console.log('Login successful');
     req.session.authenticated = true;
     
+    console.log('Setting session.authenticated to true');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session data before save:', req.session);
+    
     // Save session before redirect
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
         return res.status(500).send('Session error');
       }
-      console.log('Session saved successfully, redirecting to /admin/events');
+      console.log('Session saved successfully');
+      console.log('Session data after save:', req.session);
+      console.log('Redirecting to /admin/events');
       res.redirect('/admin/events');
     });
   } else {

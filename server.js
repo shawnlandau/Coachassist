@@ -21,11 +21,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.ADMIN_PASSWORD || 'change-this-secret-key',
-  resave: false,
+  resave: true, // Changed to true to refresh session on each request
   saveUninitialized: false,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    httpOnly: true,
+    secure: false // Set to false for non-HTTPS (DigitalOcean handles SSL at load balancer)
+  },
+  rolling: true // Refresh session expiry on each request
 }));
 
 // Template rendering helper
@@ -75,9 +78,17 @@ function renderTemplate(templateName, data = {}) {
 
 // Auth middleware
 function requireAuth(req, res, next) {
+  console.log('Auth check:', {
+    authenticated: req.session.authenticated,
+    sessionID: req.sessionID,
+    path: req.path,
+    method: req.method
+  });
+  
   if (req.session.authenticated) {
     next();
   } else {
+    console.log('Authentication failed, redirecting to login');
     res.redirect('/admin/login');
   }
 }

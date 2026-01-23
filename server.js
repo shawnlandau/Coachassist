@@ -142,6 +142,38 @@ app.get('/debug/test-event', requireAuth, (req, res) => {
   }
 });
 
+// Debug endpoint to check what events the bot sees
+app.get('/debug/check-events', (req, res) => {
+  try {
+    const { getUpcomingEvents } = require('./database');
+    const allEvents = eventQueries.getActiveEvents.all();
+    const upcomingEvents = getUpcomingEvents();
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - 12 * 60 * 60 * 1000);
+    const windowEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    res.json({
+      currentTime: now.toISOString(),
+      windowStart: windowStart.toISOString(),
+      windowEnd: windowEnd.toISOString(),
+      allActiveEvents: allEvents.map(e => ({
+        id: e.id,
+        venue: e.venue_name,
+        datetime: e.start_datetime_local,
+        is_active: e.is_active
+      })),
+      upcomingEventsCount: upcomingEvents.length,
+      upcomingEvents: upcomingEvents.map(e => ({
+        id: e.id,
+        venue: e.venue_name,
+        datetime: e.start_datetime_local
+      }))
+    });
+  } catch (error) {
+    res.json({ error: error.message, stack: error.stack });
+  }
+});
+
 // GroupMe webhook callback
 app.post('/groupme/callback', async (req, res) => {
   try {

@@ -26,11 +26,11 @@ app.use(session({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    secure: 'auto', // Auto-detect based on connection
-    sameSite: 'lax' // Better cross-site cookie handling
+    secure: false, // Set to false - DigitalOcean handles SSL at load balancer
+    sameSite: 'lax'
   },
   rolling: true,
-  name: 'teamhelper.sid' // Custom session name to avoid conflicts
+  name: 'teamhelper.sid'
 }));
 
 // Template rendering helper

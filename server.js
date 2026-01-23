@@ -248,6 +248,21 @@ app.post('/admin/events', requireAuth, (req, res) => {
       is_active
     } = req.body;
 
+    console.log('Creating event with data:', {
+      start_datetime_local,
+      venue_name,
+      address,
+      field_number,
+      arrival_minutes_before,
+      is_active
+    });
+
+    // Validate required fields
+    if (!start_datetime_local || !venue_name || !address) {
+      console.error('Missing required fields');
+      return res.status(400).send('Missing required fields: date/time, venue name, and address are required');
+    }
+
     eventQueries.createEvent.run(
       start_datetime_local,
       venue_name,
@@ -259,10 +274,12 @@ app.post('/admin/events', requireAuth, (req, res) => {
       is_active ? 1 : 0
     );
 
+    console.log('Event created successfully');
     res.redirect('/admin/events');
   } catch (error) {
     console.error('Error creating event:', error);
-    res.status(500).send('Error creating event');
+    console.error('Error stack:', error.stack);
+    res.status(500).send(`Error creating event: ${error.message}`);
   }
 });
 

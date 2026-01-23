@@ -21,14 +21,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.ADMIN_PASSWORD || 'change-this-secret-key',
-  resave: true, // Changed to true to refresh session on each request
+  resave: true,
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    secure: false // Set to false for non-HTTPS (DigitalOcean handles SSL at load balancer)
+    secure: 'auto', // Auto-detect based on connection
+    sameSite: 'lax' // Better cross-site cookie handling
   },
-  rolling: true // Refresh session expiry on each request
+  rolling: true,
+  name: 'teamhelper.sid' // Custom session name to avoid conflicts
 }));
 
 // Template rendering helper
